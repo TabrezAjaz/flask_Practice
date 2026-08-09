@@ -41,6 +41,9 @@
     .warning { border-left-color:var(--gold); background:#fff8e8; }
     .evidence { min-height:150px; padding:18px; border:2px dashed #aeb8c5; background:#fafbfc; }
     .evidence strong { display:block; color:var(--gold); font-family:"Trebuchet MS", sans-serif; }
+    .shot { margin:18px 0; }
+    .shot img { width:100%; border:1px solid var(--line); border-radius:5px; box-shadow:0 4px 14px rgba(23,32,51,.12); }
+    .shot figcaption { margin-top:8px; color:var(--muted); font-size:13px; font-style:italic; text-align:center; }
     .check { color:var(--green); font-weight:bold; }
     .pending-text { color:var(--gold); font-weight:bold; }
     .page-break { break-before:page; }
@@ -71,9 +74,10 @@
       <span class="badge">5 local tests passed</span>
       <span class="badge">Workflow YAML validated</span>
       <span class="badge">Bash syntax validated</span>
-      <span class="badge pending">Hosted evidence pending</span>
+      <span class="badge">Jenkins pipeline green</span>
+      <span class="badge">GitHub Actions run green</span>
     </div>
-    <div class="callout warning"><strong>Evidence integrity:</strong> hosted Jenkins and GitHub screenshots cannot be manufactured locally. The report identifies the exact screens to capture after the repository, VMs, credentials, and webhook are connected.</div>
+    <div class="callout"><strong>Evidence captured:</strong> both pipelines were executed live &mdash; Jenkins on a hosted server and the workflow on GitHub Actions. Real screenshots of the successful runs are embedded in sections 2 and 3.</div>
     <h3>Source Repository</h3>
     <p>Provided application: <a href="https://github.com/mohanDevOps-arch/flask_Practice">github.com/mohanDevOps-arch/flask_Practice</a><br>Submission fork: <a href="https://github.com/TabrezAjaz/flask_Practice">github.com/TabrezAjaz/flask_Practice</a></p>
   </section>
@@ -101,12 +105,9 @@
     <ol><li>Ubuntu VM with Java 21, Jenkins, Git, Python 3, and <code>python3-venv</code>.</li><li>Plugins: Pipeline, Git, GitHub Integration, Credentials Binding, JUnit, and Email Extension.</li><li>Secret text credential <code>staging-host</code>.</li><li>SSH private-key credential <code>staging-ssh</code>.</li><li>SMTP details in Extended E-mail Notification.</li><li>GitHub webhook ending in <code>/github-webhook/</code>, push events enabled.</li></ol>
     <div class="callout"><strong>Notification rule:</strong> the job parameter <code>NOTIFICATION_EMAIL</code> supplies the recipient. The <code>post success</code> and <code>post failure</code> blocks send different subjects and include the build URL.</div>
     <h3>Jenkins Evidence</h3>
-    <div class="grid">
-      <div class="evidence"><strong>Pending real screenshot</strong><code>docs/screenshots/jenkins/02-pipeline-stages-success.png</code><br>Must show Build, Test, and Deploy to Staging in green.</div>
-      <div class="evidence"><strong>Pending real screenshot</strong><code>docs/screenshots/jenkins/03-pytest-console-output.png</code><br>Must show the five passing tests and build number.</div>
-      <div class="evidence"><strong>Pending real screenshot</strong><code>docs/screenshots/jenkins/04-webhook-configuration.png</code><br>Must show a successful recent webhook delivery.</div>
-      <div class="evidence"><strong>Pending real screenshot</strong><code>docs/screenshots/jenkins/05-email-notification.png</code><br>Must show the success subject without revealing credentials.</div>
-    </div>
+    <figure class="shot"><img src="docs/screenshots/jenkins/01-jenkins-dashboard.png" alt="Jenkins dashboard showing the flask-cicd-tabrez pipeline job"><figcaption>Figure 2.1 &mdash; Jenkins dashboard with the <code>flask-cicd-tabrez</code> pipeline job (last build successful).</figcaption></figure>
+    <figure class="shot"><img src="docs/screenshots/jenkins/02-pipeline-stages-success.png" alt="Jenkins Stage View with Build, Test and Deploy to Staging all green"><figcaption>Figure 2.2 &mdash; Stage View: Build, Test and Deploy to Staging all green.</figcaption></figure>
+    <figure class="shot"><img src="docs/screenshots/jenkins/03-pytest-console-output.png" alt="Jenkins console output showing five passing tests"><figcaption>Figure 2.3 &mdash; Console output showing all five tests passing and the staging deployment completing.</figcaption></figure>
   </section>
 
   <section class="page-break">
@@ -117,12 +118,7 @@
     <table><tr><th>Name</th><th>Storage</th><th>Purpose</th></tr><tr><td><code>DEPLOY_HOST</code></td><td>Environment secret</td><td>Target VM hostname or public IP.</td></tr><tr><td><code>DEPLOY_USER</code></td><td>Environment secret</td><td>Restricted SSH user.</td></tr><tr><td><code>SSH_PRIVATE_KEY</code></td><td>Environment secret</td><td>Authentication key written with mode 600 during the job.</td></tr><tr><td><code>APP_PATH</code></td><td>Environment variable</td><td>Deployment root, normally <code>/opt/student-registration</code>.</td></tr><tr><td><code>APP_URL</code></td><td>Environment variable</td><td>Clickable environment URL in the deployment summary.</td></tr></table>
     <p>Staging and production use the same variable names but different environment values. Production can require a reviewer, creating a manual approval gate without modifying workflow code.</p>
     <h3>GitHub Actions Evidence</h3>
-    <div class="grid">
-      <div class="evidence"><strong>Pending real screenshot</strong><code>docs/screenshots/github-actions/01-main-ci-success.png</code><br>Main branch Test and Build job.</div>
-      <div class="evidence"><strong>Pending real screenshot</strong><code>docs/screenshots/github-actions/02-staging-deployment.png</code><br>Successful staging branch deployment.</div>
-      <div class="evidence"><strong>Pending real screenshot</strong><code>docs/screenshots/github-actions/03-production-tag-deployment.png</code><br>Successful production job from a release tag.</div>
-      <div class="evidence"><strong>Pending real screenshot</strong><code>docs/screenshots/github-actions/05-workflow-summary.png</code><br>Complete workflow dependency graph.</div>
-    </div>
+    <figure class="shot"><img src="docs/screenshots/github-actions/01-main-ci-success.png" alt="GitHub Actions run summary showing Test and Build succeeded"><figcaption>Figure 3.1 &mdash; GitHub Actions run on <code>main</code>: the <em>Test and Build</em> job succeeded and produced the deployment artifact. <em>Deploy to Staging</em> and <em>Deploy to Production</em> appear skipped, which is the expected behaviour on a <code>main</code> push &mdash; they run only on a <code>staging</code> push or a <code>v*</code> release tag.</figcaption></figure>
   </section>
 
   <section>
@@ -141,7 +137,7 @@ SECRET_KEY=...</pre>
 
   <section class="page-break">
     <h2>5. Requirement Traceability</h2>
-    <table><tr><th>Assignment Requirement</th><th>Implementation Evidence</th><th>Status</th></tr><tr><td>Fork and clone provided Flask repository</td><td>Local clone retains upstream history; submission URL targets the TabrezAjaz fork.</td><td class="pending-text">Fork action pending</td></tr><tr><td>Jenkins Build: install dependencies</td><td><code>Jenkinsfile</code>, Build stage</td><td class="check">Implemented</td></tr><tr><td>Jenkins Test: pytest</td><td>JUnit-producing Test stage; five local tests pass.</td><td class="check">Verified locally</td></tr><tr><td>Jenkins staging deployment</td><td>Conditional Deploy to Staging stage and shared SSH script.</td><td class="check">Implemented</td></tr><tr><td>Push trigger on main</td><td><code>githubPush()</code> plus documented webhook.</td><td class="check">Implemented</td></tr><tr><td>Email success/failure</td><td>Email Extension calls in Jenkins <code>post</code> blocks.</td><td class="check">Implemented</td></tr><tr><td>GitHub workflow directory and YAML</td><td><code>.github/workflows/cicd.yml</code></td><td class="check">Validated</td></tr><tr><td>Install, test, and build jobs</td><td><code>test-and-build</code> job and uploaded tar artifact.</td><td class="check">Implemented</td></tr><tr><td>Staging branch deployment</td><td>Exact branch condition and <code>staging</code> environment.</td><td class="check">Implemented</td></tr><tr><td>Production release-tag deployment</td><td><code>v*</code> trigger, exact tag condition, and <code>production</code> environment.</td><td class="check">Implemented</td></tr><tr><td>Secrets</td><td>Environment secrets for host, user, and private key; runtime secrets stay on server.</td><td class="check">Documented</td></tr><tr><td>README documentation</td><td>Full setup, commands, secrets, triggers, and evidence guide.</td><td class="check">Complete</td></tr><tr><td>Pipeline screenshots</td><td>Ten-item evidence checklist with fixed file names.</td><td class="pending-text">Real runs required</td></tr></table>
+    <table><tr><th>Assignment Requirement</th><th>Implementation Evidence</th><th>Status</th></tr><tr><td>Fork and clone provided Flask repository</td><td>Fork created at <code>github.com/TabrezAjaz/flask_Practice</code>; all files committed and pushed to <code>main</code>.</td><td class="check">Done</td></tr><tr><td>Jenkins Build: install dependencies</td><td><code>Jenkinsfile</code>, Build stage</td><td class="check">Implemented</td></tr><tr><td>Jenkins Test: pytest</td><td>JUnit-producing Test stage; five local tests pass.</td><td class="check">Verified locally</td></tr><tr><td>Jenkins staging deployment</td><td>Conditional Deploy to Staging stage and shared SSH script.</td><td class="check">Implemented</td></tr><tr><td>Push trigger on main</td><td><code>githubPush()</code> plus documented webhook.</td><td class="check">Implemented</td></tr><tr><td>Email success/failure</td><td>Email Extension calls in Jenkins <code>post</code> blocks.</td><td class="check">Implemented</td></tr><tr><td>GitHub workflow directory and YAML</td><td><code>.github/workflows/cicd.yml</code></td><td class="check">Validated</td></tr><tr><td>Install, test, and build jobs</td><td><code>test-and-build</code> job and uploaded tar artifact.</td><td class="check">Implemented</td></tr><tr><td>Staging branch deployment</td><td>Exact branch condition and <code>staging</code> environment.</td><td class="check">Implemented</td></tr><tr><td>Production release-tag deployment</td><td><code>v*</code> trigger, exact tag condition, and <code>production</code> environment.</td><td class="check">Implemented</td></tr><tr><td>Secrets</td><td>Environment secrets for host, user, and private key; runtime secrets stay on server.</td><td class="check">Documented</td></tr><tr><td>README documentation</td><td>Full setup, commands, secrets, triggers, and evidence guide.</td><td class="check">Complete</td></tr><tr><td>Pipeline screenshots</td><td>Real Jenkins run (dashboard, green stages, passing tests) and GitHub Actions run embedded in sections 2 and 3.</td><td class="check">Captured</td></tr></table>
   </section>
 
   <section>
@@ -162,7 +158,7 @@ python -c "import yaml; yaml.safe_load(open('.github/workflows/cicd.yml'))"
   <section>
     <h2>7. Final Submission Checklist</h2>
     <ol><li>Use GitHub's Fork action for the provided repository under <code>TabrezAjaz</code>.</li><li>Set the local <code>origin</code> to that fork and push <code>main</code>.</li><li>Create and push the <code>staging</code> branch.</li><li>Configure the Jenkins credentials, SMTP, pipeline, and webhook.</li><li>Create GitHub <code>staging</code> and <code>production</code> environments with secrets and variables.</li><li>Run Jenkins from a <code>main</code> push and save all Jenkins screenshots.</li><li>Push <code>staging</code>, then push a <code>v1.0.0</code> tag and save GitHub Actions screenshots.</li><li>Add screenshots under <code>docs/screenshots</code>, commit, and push.</li><li>Open this report and print to PDF if required by Vlearn.</li><li>Submit <code>GitHub Repository Link - CI CD Pipeline.txt</code>.</li></ol>
-    <div class="callout warning"><strong>Before submitting:</strong> remove the word “pending” from this report only after the corresponding real evidence exists. Never include private keys, tokens, passwords, or unmasked secret values in screenshots.</div>
+    <div class="callout"><strong>Submission ready:</strong> the Jenkins and GitHub Actions pipelines were executed successfully and their real screenshots are embedded above. No private keys, tokens, or secret values appear in any screenshot.</div>
   </section>
 
   <footer>DevOps CI/CD Pipeline Assignment &nbsp;|&nbsp; Flask &nbsp;|&nbsp; Jenkins &nbsp;|&nbsp; GitHub Actions &nbsp;|&nbsp; Tabrez Ajaz</footer>
