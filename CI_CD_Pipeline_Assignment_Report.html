@@ -50,7 +50,7 @@
     .page-break { break-before:page; }
     footer { padding:28px 64px; color:white; background:var(--ink); }
     @media (max-width:760px) { section { padding:34px 22px; } h1 { font-size:38px; } .meta,.grid { grid-template-columns:1fr; } .flow { grid-template-columns:1fr; } .flow div::after { display:none; } }
-    @media print { html, body { -webkit-print-color-adjust:exact; print-color-adjust:exact; } body { background:white; font-size:11px; } main { width:100%; margin:0; box-shadow:none; } section { padding:26px 30px; } .cover { min-height:96vh; } a { color:inherit; text-decoration:none; } pre { white-space:pre-wrap; } .shot, table, pre, .panel, figure { page-break-inside:avoid; } .shot img { max-width:100%; } h2 { break-after:avoid; } }
+    @media print { html, body { -webkit-print-color-adjust:exact; print-color-adjust:exact; } body { background:white; font-size:11px; } main { width:100%; margin:0; box-shadow:none; } section { padding:26px 30px; break-before:page; page-break-before:always; } .cover { min-height:96vh; break-before:auto; page-break-before:avoid; } a { color:inherit; text-decoration:none; } pre { white-space:pre-wrap; } .shot, table, pre, .panel, figure { page-break-inside:avoid; } .shot img { max-width:100%; } h2 { break-after:avoid; } }
   </style>
 </head>
 <body>
