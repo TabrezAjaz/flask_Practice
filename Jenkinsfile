@@ -6,8 +6,9 @@ pipeline {
     }
 
     environment {
-        VENV = '.venv'
         STAGING_APP_PATH = 'staging_deploy'
+        // Install to the user site and allow pip on externally-managed agents
+        PIP_BREAK_SYSTEM_PACKAGES = '1'
     }
 
     options {
@@ -22,12 +23,10 @@ pipeline {
         stage('Build') {
             steps {
                 sh '''
-                    python3 -m venv "$VENV"
-                    . "$VENV/bin/activate"
-                    python -m pip install --upgrade pip
-                    pip install -r requirements-dev.txt
+                    python3 -m pip install --user --upgrade pip || true
+                    python3 -m pip install --user -r requirements-dev.txt
                     mkdir -p dist
-                    tar --exclude=.git --exclude=.venv --exclude=dist \
+                    tar --exclude=.git --exclude=dist \
                         -czf "dist/flask-app-${BUILD_NUMBER}.tar.gz" .
                 '''
             }
@@ -35,10 +34,7 @@ pipeline {
 
         stage('Test') {
             steps {
-                sh '''
-                    . "$VENV/bin/activate"
-                    pytest -q --junitxml=test-results.xml
-                '''
+                sh 'python3 -m pytest -q --junitxml=test-results.xml'
             }
         }
 
