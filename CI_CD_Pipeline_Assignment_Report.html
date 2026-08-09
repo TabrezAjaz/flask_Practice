@@ -6,6 +6,7 @@
   <title>DevOps CI/CD Pipeline Assignment - Tabrez Ajaz</title>
   <style>
     :root { --ink:#172033; --muted:#5f6878; --blue:#1769aa; --red:#d94841; --green:#16805b; --gold:#ad7214; --line:#dce2ea; --paper:#ffffff; --wash:#f4f7fa; }
+    @page { size: A4 portrait; margin: 1.4cm 1.3cm; }
     * { box-sizing:border-box; }
     body { margin:0; color:var(--ink); background:#e9edf2; font:15px/1.55 Georgia, "Times New Roman", serif; letter-spacing:0; }
     main { width:min(1060px, 100%); margin:24px auto; background:var(--paper); box-shadow:0 12px 36px rgba(23,32,51,.12); }
@@ -49,7 +50,7 @@
     .page-break { break-before:page; }
     footer { padding:28px 64px; color:white; background:var(--ink); }
     @media (max-width:760px) { section { padding:34px 22px; } h1 { font-size:38px; } .meta,.grid { grid-template-columns:1fr; } .flow { grid-template-columns:1fr; } .flow div::after { display:none; } }
-    @media print { body { background:white; font-size:12px; } main { width:100%; margin:0; box-shadow:none; } section { padding:34px 44px; } .cover { min-height:95vh; } a { color:inherit; text-decoration:none; } pre { white-space:pre-wrap; } }
+    @media print { html, body { -webkit-print-color-adjust:exact; print-color-adjust:exact; } body { background:white; font-size:11px; } main { width:100%; margin:0; box-shadow:none; } section { padding:26px 30px; } .cover { min-height:96vh; } a { color:inherit; text-decoration:none; } pre { white-space:pre-wrap; } .shot, table, pre, .panel, figure { page-break-inside:avoid; } .shot img { max-width:100%; } h2 { break-after:avoid; } }
   </style>
 </head>
 <body>
@@ -119,6 +120,7 @@
     <p>Staging and production use the same variable names but different environment values. Production can require a reviewer, creating a manual approval gate without modifying workflow code.</p>
     <h3>GitHub Actions Evidence</h3>
     <figure class="shot"><img src="docs/screenshots/github-actions/01-main-ci-success.png" alt="GitHub Actions run summary showing Test and Build succeeded"><figcaption>Figure 3.1 &mdash; GitHub Actions run on <code>main</code>: the <em>Test and Build</em> job succeeded and produced the deployment artifact. <em>Deploy to Staging</em> and <em>Deploy to Production</em> appear skipped, which is the expected behaviour on a <code>main</code> push &mdash; they run only on a <code>staging</code> push or a <code>v*</code> release tag.</figcaption></figure>
+    <figure class="shot"><img src="docs/screenshots/github-actions/02-all-workflow-runs.png" alt="GitHub Actions all workflow runs list, all green"><figcaption>Figure 3.2 &mdash; Workflow run history for the <em>Flask CI/CD</em> workflow &mdash; every run on <code>main</code> completed successfully.</figcaption></figure>
   </section>
 
   <section>
