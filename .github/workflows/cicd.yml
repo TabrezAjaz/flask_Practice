@@ -1,0 +1,110 @@
+name: Flask CI/CD
+
+on:
+  push:
+    branches: [main, staging]
+    tags: ["v*"]
+  pull_request:
+    branches: [main, staging]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: flask-cicd-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test-and-build:
+    name: Test and Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-dev.txt
+
+      - name: Run tests
+        run: pytest -q --junitxml=test-results.xml
+
+      - name: Build deployment artifact
+        run: |
+          mkdir -p dist
+          tar --exclude=.git --exclude=.venv --exclude=dist \
+            -czf dist/student-registration.tar.gz .
+
+      - name: Upload deployment artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: student-registration-${{ github.sha }}
+          path: dist/student-registration.tar.gz
+          if-no-files-found: error
+          retention-days: 14
+
+  deploy-staging:
+    name: Deploy to Staging
+    needs: test-and-build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/staging'
+    runs-on: ubuntu-latest
+    environment:
+      name: staging
+      url: ${{ vars.APP_URL }}
+    steps:
+      - name: Check out deployment script
+        uses: actions/checkout@v4
+
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: student-registration-${{ github.sha }}
+          path: dist
+
+      - name: Configure SSH key
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$SSH_PRIVATE_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+
+      - name: Deploy and verify staging
+        run: bash ./scripts/deploy.sh staging "${{ secrets.DEPLOY_HOST }}" "${{ secrets.DEPLOY_USER }}" "${{ vars.APP_PATH }}" ~/.ssh/deploy_key "${{ github.run_number }}"
+
+  deploy-production:
+    name: Deploy to Production
+    needs: test-and-build
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: ${{ vars.APP_URL }}
+    steps:
+      - name: Check out deployment script
+        uses: actions/checkout@v4
+
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: student-registration-${{ github.sha }}
+          path: dist
+
+      - name: Configure SSH key
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$SSH_PRIVATE_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+
+      - name: Deploy and verify production
+        run: bash ./scripts/deploy.sh production "${{ secrets.DEPLOY_HOST }}" "${{ secrets.DEPLOY_USER }}" "${{ vars.APP_PATH }}" ~/.ssh/deploy_key "${{ github.run_number }}"

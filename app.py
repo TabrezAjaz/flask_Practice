@@ -9,18 +9,30 @@ import os
 load_dotenv()
 
 app = Flask(__name__)
-app.config["MONGO_URI"] = os.getenv("MONGO_URI")
-app.secret_key = os.getenv("SECRET_KEY")
+app.config["MONGO_URI"] = os.getenv("MONGO_URI", "mongodb://localhost:27017/student_db")
+app.secret_key = os.getenv("SECRET_KEY", "development-only-key")
 
 # Use certifi CA bundle explicitly for cross-platform TLS reliability
 # (notably fixes common macOS certificate verification failures).
 mongo = PyMongo(app, tlsCAFile=certifi.where())
 
+
+def student_collection():
+    test_client = app.config.get("MONGO_TEST_CLIENT")
+    if test_client is not None:
+        return test_client.get_database("test_student_db").students
+    return mongo.db.students
+
 # Home page -> list students
 @app.route('/')
 def index():
-    students = mongo.db.students.find()
+    students = student_collection().find()
     return render_template('index.html', students=students)
+
+
+@app.route('/health')
+def health():
+    return {"service": "student-registration", "status": "healthy"}
 
 # Add student
 @app.route('/add', methods=['GET', 'POST'])
@@ -29,7 +41,7 @@ def add_student():
         name = request.form['name']
         email = request.form['email']
         course = request.form['course']
-        mongo.db.students.insert_one({
+        student_collection().insert_one({
             "name": name,
             "email": email,
             "course": course
@@ -40,12 +52,12 @@ def add_student():
 # Update student
 @app.route('/update/<student_id>', methods=['GET', 'POST'])
 def update_student(student_id):
-    student = mongo.db.students.find_one({"_id": ObjectId(student_id)})
+    student = student_collection().find_one({"_id": ObjectId(student_id)})
     if request.method == 'POST':
         new_name = request.form['name']
         new_email = request.form['email']
         new_course = request.form['course']
-        mongo.db.students.update_one(
+        student_collection().update_one(
             {"_id": ObjectId(student_id)},
             {"$set": {"name": new_name, "email": new_email, "course": new_course}}
         )
@@ -56,7 +68,7 @@ def update_student(student_id):
 # Delete student
 @app.route('/delete/<student_id>')
 def delete_student(student_id):
-    mongo.db.students.delete_one({"_id": ObjectId(student_id)})
+    student_collection().delete_one({"_id": ObjectId(student_id)})
     return redirect(url_for('index'))
 
 if __name__ == '__main__':

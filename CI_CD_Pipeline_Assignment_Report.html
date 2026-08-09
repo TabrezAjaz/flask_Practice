@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DevOps CI/CD Pipeline Assignment - Tabrez Ajaz</title>
+  <style>
+    :root { --ink:#172033; --muted:#5f6878; --blue:#1769aa; --red:#d94841; --green:#16805b; --gold:#ad7214; --line:#dce2ea; --paper:#ffffff; --wash:#f4f7fa; }
+    * { box-sizing:border-box; }
+    body { margin:0; color:var(--ink); background:#e9edf2; font:15px/1.55 Georgia, "Times New Roman", serif; letter-spacing:0; }
+    main { width:min(1060px, 100%); margin:24px auto; background:var(--paper); box-shadow:0 12px 36px rgba(23,32,51,.12); }
+    section { padding:52px 64px; border-bottom:1px solid var(--line); }
+    .cover { min-height:720px; display:flex; flex-direction:column; justify-content:space-between; color:white; background:linear-gradient(135deg, #16233a 0 52%, #1769aa 52% 75%, #d94841 75%); }
+    .kicker { font:700 13px/1.2 "Trebuchet MS", sans-serif; text-transform:uppercase; color:#a9dbff; }
+    h1 { max-width:760px; margin:18px 0; font:700 54px/1.04 "Trebuchet MS", sans-serif; letter-spacing:0; }
+    h2 { margin:0 0 22px; color:var(--blue); font:700 30px/1.15 "Trebuchet MS", sans-serif; letter-spacing:0; }
+    h3 { margin:28px 0 10px; font:700 19px/1.2 "Trebuchet MS", sans-serif; letter-spacing:0; }
+    p { margin:8px 0 14px; }
+    a { color:var(--blue); }
+    code, pre { font-family:Consolas, "Courier New", monospace; }
+    code { padding:1px 4px; border-radius:3px; background:#eef2f6; }
+    pre { overflow:auto; padding:18px; color:#edf5ff; background:#19263b; border-left:5px solid var(--red); font-size:13px; }
+    table { width:100%; margin:16px 0 24px; border-collapse:collapse; }
+    th, td { padding:10px 12px; border:1px solid var(--line); text-align:left; vertical-align:top; }
+    th { color:white; background:var(--blue); font-family:"Trebuchet MS", sans-serif; }
+    tr:nth-child(even) td { background:var(--wash); }
+    .meta { display:grid; grid-template-columns:repeat(3, 1fr); gap:16px; }
+    .meta div { padding:14px 0; border-top:2px solid rgba(255,255,255,.65); }
+    .meta strong { display:block; font-family:"Trebuchet MS", sans-serif; }
+    .badges { display:flex; flex-wrap:wrap; gap:8px; margin:18px 0; }
+    .badge { padding:5px 9px; border-radius:4px; color:white; background:var(--green); font:700 12px "Trebuchet MS", sans-serif; }
+    .badge.pending { background:var(--gold); }
+    .grid { display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:18px; }
+    .panel { padding:20px; border:1px solid var(--line); border-top:4px solid var(--blue); }
+    .panel h3 { margin-top:0; }
+    .flow { display:grid; grid-template-columns:repeat(5, 1fr); gap:8px; margin:24px 0; align-items:stretch; }
+    .flow div { position:relative; display:flex; min-height:82px; align-items:center; justify-content:center; padding:10px; text-align:center; color:white; background:var(--blue); font:700 13px/1.3 "Trebuchet MS", sans-serif; }
+    .flow div:nth-child(2n) { background:var(--red); }
+    .flow div:not(:last-child)::after { content:""; position:absolute; z-index:2; right:-8px; width:16px; height:16px; transform:rotate(45deg); background:inherit; }
+    .callout { margin:20px 0; padding:16px 18px; border-left:5px solid var(--green); background:#eef8f4; }
+    .warning { border-left-color:var(--gold); background:#fff8e8; }
+    .evidence { min-height:150px; padding:18px; border:2px dashed #aeb8c5; background:#fafbfc; }
+    .evidence strong { display:block; color:var(--gold); font-family:"Trebuchet MS", sans-serif; }
+    .check { color:var(--green); font-weight:bold; }
+    .pending-text { color:var(--gold); font-weight:bold; }
+    .page-break { break-before:page; }
+    footer { padding:28px 64px; color:white; background:var(--ink); }
+    @media (max-width:760px) { section { padding:34px 22px; } h1 { font-size:38px; } .meta,.grid { grid-template-columns:1fr; } .flow { grid-template-columns:1fr; } .flow div::after { display:none; } }
+    @media print { body { background:white; font-size:12px; } main { width:100%; margin:0; box-shadow:none; } section { padding:34px 44px; } .cover { min-height:95vh; } a { color:inherit; text-decoration:none; } pre { white-space:pre-wrap; } }
+  </style>
+</head>
+<body>
+<main>
+  <section class="cover">
+    <div>
+      <div class="kicker">HeroVired DevOps Assignment</div>
+      <h1>CI/CD Pipelines for a Flask Application</h1>
+      <p style="max-width:620px;font-size:20px">Jenkins and GitHub Actions implementations covering automated build, isolated testing, staged deployment, production releases, secrets, triggers, and notifications.</p>
+    </div>
+    <div class="meta">
+      <div><strong>Submitted by</strong>Tabrez Ajaz</div>
+      <div><strong>Application</strong>Student Registration System</div>
+      <div><strong>Date</strong>7 August 2026</div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Executive Summary</h2>
+    <p>This project starts from the assignment's provided public Flask repository and implements two independent but consistent CI/CD solutions. Both pipelines install dependencies, run five unit tests, package the application, and stop immediately when a test fails. Jenkins deploys successful <code>main</code> builds to staging and sends an email result. GitHub Actions deploys <code>staging</code> pushes to staging and annotated <code>v*</code> tags to production.</p>
+    <div class="badges">
+      <span class="badge">5 local tests passed</span>
+      <span class="badge">Workflow YAML validated</span>
+      <span class="badge">Bash syntax validated</span>
+      <span class="badge pending">Hosted evidence pending</span>
+    </div>
+    <div class="callout warning"><strong>Evidence integrity:</strong> hosted Jenkins and GitHub screenshots cannot be manufactured locally. The report identifies the exact screens to capture after the repository, VMs, credentials, and webhook are connected.</div>
+    <h3>Source Repository</h3>
+    <p>Provided application: <a href="https://github.com/mohanDevOps-arch/flask_Practice">github.com/mohanDevOps-arch/flask_Practice</a><br>Submission fork: <a href="https://github.com/TabrezAjaz/flask_Practice">github.com/TabrezAjaz/flask_Practice</a></p>
+  </section>
+
+  <section>
+    <h2>1. Architecture and Application</h2>
+    <div class="flow">
+      <div>Git Push or Tag</div><div>CI Trigger</div><div>Install and Test</div><div>Build Artifact</div><div>SSH Deploy and Health Check</div>
+    </div>
+    <div class="grid">
+      <div class="panel"><h3>Application</h3><p>Python Flask CRUD application for student records. Flask-PyMongo connects to MongoDB in live environments. Gunicorn runs the deployed service behind a local port.</p></div>
+      <div class="panel"><h3>Test Isolation</h3><p>The inherited tests required a real MongoDB daemon. They now inject <code>mongomock.MongoClient</code>, giving repeatable tests on Jenkins and GitHub-hosted runners.</p></div>
+      <div class="panel"><h3>Release Model</h3><p>Each run creates <code>student-registration.tar.gz</code>. The server expands it into a numbered release, installs runtime dependencies, and atomically updates the <code>current</code> link.</p></div>
+      <div class="panel"><h3>Verification</h3><p>After systemd restart, deployment calls <code>http://127.0.0.1:8000/health</code>. A non-200 response fails the deployment instead of reporting a false success.</p></div>
+    </div>
+    <h3>Automated Tests</h3>
+    <table><tr><th>Test</th><th>Behavior Verified</th></tr><tr><td>Home page</td><td>Returns HTTP 200 and renders seeded student data.</td></tr><tr><td>Health check</td><td>Returns HTTP 200 and a healthy JSON status.</td></tr><tr><td>Add student</td><td>Creates and displays a submitted record.</td></tr><tr><td>Update student</td><td>Modifies and displays an existing record.</td></tr><tr><td>Delete student</td><td>Removes a temporary student record.</td></tr></table>
+  </section>
+
+  <section class="page-break">
+    <h2>2. Jenkins CI/CD Pipeline</h2>
+    <p>The root <code>Jenkinsfile</code> is a declarative pipeline. Jenkins checks out the fork from SCM and responds to GitHub push webhooks through <code>githubPush()</code>.</p>
+    <table><tr><th>Stage</th><th>Implementation</th><th>Failure Behavior</th></tr><tr><td>Build</td><td>Create virtual environment, install <code>requirements-dev.txt</code>, and package a tar artifact.</td><td>Dependency or packaging error stops the run.</td></tr><tr><td>Test</td><td>Run <code>pytest -q --junitxml=test-results.xml</code>.</td><td>Any failed test blocks deployment.</td></tr><tr><td>Deploy to Staging</td><td>On <code>main</code>, bind SSH credentials and run the shared deployment script.</td><td>SSH, service restart, or health-check error fails the run.</td></tr><tr><td>Post</td><td>Publish JUnit, archive artifact, and send success/failure email through Email Extension.</td><td>Result remains visible in Jenkins even if notification is disabled.</td></tr></table>
+    <h3>Required Jenkins Configuration</h3>
+    <ol><li>Ubuntu VM with Java 21, Jenkins, Git, Python 3, and <code>python3-venv</code>.</li><li>Plugins: Pipeline, Git, GitHub Integration, Credentials Binding, JUnit, and Email Extension.</li><li>Secret text credential <code>staging-host</code>.</li><li>SSH private-key credential <code>staging-ssh</code>.</li><li>SMTP details in Extended E-mail Notification.</li><li>GitHub webhook ending in <code>/github-webhook/</code>, push events enabled.</li></ol>
+    <div class="callout"><strong>Notification rule:</strong> the job parameter <code>NOTIFICATION_EMAIL</code> supplies the recipient. The <code>post success</code> and <code>post failure</code> blocks send different subjects and include the build URL.</div>
+    <h3>Jenkins Evidence</h3>
+    <div class="grid">
+      <div class="evidence"><strong>Pending real screenshot</strong><code>docs/screenshots/jenkins/02-pipeline-stages-success.png</code><br>Must show Build, Test, and Deploy to Staging in green.</div>
+      <div class="evidence"><strong>Pending real screenshot</strong><code>docs/screenshots/jenkins/03-pytest-console-output.png</code><br>Must show the five passing tests and build number.</div>
+      <div class="evidence"><strong>Pending real screenshot</strong><code>docs/screenshots/jenkins/04-webhook-configuration.png</code><br>Must show a successful recent webhook delivery.</div>
+      <div class="evidence"><strong>Pending real screenshot</strong><code>docs/screenshots/jenkins/05-email-notification.png</code><br>Must show the success subject without revealing credentials.</div>
+    </div>
+  </section>
+
+  <section class="page-break">
+    <h2>3. GitHub Actions CI/CD</h2>
+    <p>The workflow is stored at <code>.github/workflows/cicd.yml</code>. It grants read-only repository permission, cancels superseded runs on the same reference, and uses environment-scoped secrets for deployment.</p>
+    <table><tr><th>Event</th><th>Jobs</th><th>Target</th></tr><tr><td>Push to <code>main</code></td><td>Test and Build</td><td>CI artifact only</td></tr><tr><td>Pull request to <code>main</code> or <code>staging</code></td><td>Test and Build</td><td>Validation only</td></tr><tr><td>Push to <code>staging</code></td><td>Test and Build, Deploy to Staging</td><td>GitHub <code>staging</code> environment</td></tr><tr><td>Push tag matching <code>v*</code></td><td>Test and Build, Deploy to Production</td><td>GitHub <code>production</code> environment</td></tr><tr><td>Manual dispatch</td><td>Test and Build</td><td>Diagnostic CI run</td></tr></table>
+    <h3>Secrets and Variables</h3>
+    <table><tr><th>Name</th><th>Storage</th><th>Purpose</th></tr><tr><td><code>DEPLOY_HOST</code></td><td>Environment secret</td><td>Target VM hostname or public IP.</td></tr><tr><td><code>DEPLOY_USER</code></td><td>Environment secret</td><td>Restricted SSH user.</td></tr><tr><td><code>SSH_PRIVATE_KEY</code></td><td>Environment secret</td><td>Authentication key written with mode 600 during the job.</td></tr><tr><td><code>APP_PATH</code></td><td>Environment variable</td><td>Deployment root, normally <code>/opt/student-registration</code>.</td></tr><tr><td><code>APP_URL</code></td><td>Environment variable</td><td>Clickable environment URL in the deployment summary.</td></tr></table>
+    <p>Staging and production use the same variable names but different environment values. Production can require a reviewer, creating a manual approval gate without modifying workflow code.</p>
+    <h3>GitHub Actions Evidence</h3>
+    <div class="grid">
+      <div class="evidence"><strong>Pending real screenshot</strong><code>docs/screenshots/github-actions/01-main-ci-success.png</code><br>Main branch Test and Build job.</div>
+      <div class="evidence"><strong>Pending real screenshot</strong><code>docs/screenshots/github-actions/02-staging-deployment.png</code><br>Successful staging branch deployment.</div>
+      <div class="evidence"><strong>Pending real screenshot</strong><code>docs/screenshots/github-actions/03-production-tag-deployment.png</code><br>Successful production job from a release tag.</div>
+      <div class="evidence"><strong>Pending real screenshot</strong><code>docs/screenshots/github-actions/05-workflow-summary.png</code><br>Complete workflow dependency graph.</div>
+    </div>
+  </section>
+
+  <section>
+    <h2>4. Deployment Environment</h2>
+    <p>The one-time <code>scripts/install-service.sh</code> installer creates the release directory and a systemd unit. Runtime secrets remain on the VM in <code>/etc/student-registration.env</code>.</p>
+    <pre>sudo apt-get install -y python3 python3-venv curl
+bash scripts/install-service.sh /opt/student-registration "$USER"
+
+# /etc/student-registration.env (values omitted from Git)
+MONGO_URI=mongodb+srv://...
+SECRET_KEY=...</pre>
+    <h3>Deployment Sequence</h3>
+    <ol><li>Confirm the build artifact exists.</li><li>Copy it over SSH to a unique temporary path.</li><li>Create a release directory using the CI run/build number.</li><li>Extract source and create an isolated Python virtual environment.</li><li>Install runtime-only dependencies.</li><li>Update the <code>current</code> symlink.</li><li>Restart only <code>student-registration.service</code>.</li><li>Retry the health endpoint up to five times and fail if unavailable.</li></ol>
+    <div class="callout"><strong>Least privilege:</strong> the deployment user needs only SSH access, write access to the application directory, and passwordless permission for <code>systemctl restart student-registration</code>.</div>
+  </section>
+
+  <section class="page-break">
+    <h2>5. Requirement Traceability</h2>
+    <table><tr><th>Assignment Requirement</th><th>Implementation Evidence</th><th>Status</th></tr><tr><td>Fork and clone provided Flask repository</td><td>Local clone retains upstream history; submission URL targets the TabrezAjaz fork.</td><td class="pending-text">Fork action pending</td></tr><tr><td>Jenkins Build: install dependencies</td><td><code>Jenkinsfile</code>, Build stage</td><td class="check">Implemented</td></tr><tr><td>Jenkins Test: pytest</td><td>JUnit-producing Test stage; five local tests pass.</td><td class="check">Verified locally</td></tr><tr><td>Jenkins staging deployment</td><td>Conditional Deploy to Staging stage and shared SSH script.</td><td class="check">Implemented</td></tr><tr><td>Push trigger on main</td><td><code>githubPush()</code> plus documented webhook.</td><td class="check">Implemented</td></tr><tr><td>Email success/failure</td><td>Email Extension calls in Jenkins <code>post</code> blocks.</td><td class="check">Implemented</td></tr><tr><td>GitHub workflow directory and YAML</td><td><code>.github/workflows/cicd.yml</code></td><td class="check">Validated</td></tr><tr><td>Install, test, and build jobs</td><td><code>test-and-build</code> job and uploaded tar artifact.</td><td class="check">Implemented</td></tr><tr><td>Staging branch deployment</td><td>Exact branch condition and <code>staging</code> environment.</td><td class="check">Implemented</td></tr><tr><td>Production release-tag deployment</td><td><code>v*</code> trigger, exact tag condition, and <code>production</code> environment.</td><td class="check">Implemented</td></tr><tr><td>Secrets</td><td>Environment secrets for host, user, and private key; runtime secrets stay on server.</td><td class="check">Documented</td></tr><tr><td>README documentation</td><td>Full setup, commands, secrets, triggers, and evidence guide.</td><td class="check">Complete</td></tr><tr><td>Pipeline screenshots</td><td>Ten-item evidence checklist with fixed file names.</td><td class="pending-text">Real runs required</td></tr></table>
+  </section>
+
+  <section>
+    <h2>6. Verification and Troubleshooting</h2>
+    <h3>Completed Local Verification</h3>
+    <pre>pytest -q
+.....                                                                    [100%]
+5 passed
+
+bash -n scripts/deploy.sh scripts/install-service.sh
+# exit code 0
+
+python -c "import yaml; yaml.safe_load(open('.github/workflows/cicd.yml'))"
+# parsed successfully</pre>
+    <table><tr><th>Symptom</th><th>Likely Cause</th><th>Resolution</th></tr><tr><td>Jenkins job does not trigger</td><td>Webhook cannot reach port 8080 or URL lacks trailing path.</td><td>Allow inbound access, use <code>/github-webhook/</code>, and inspect Recent Deliveries.</td></tr><tr><td>Deploy stage cannot bind credentials</td><td>Credential IDs differ from the Jenkinsfile.</td><td>Create exact IDs <code>staging-host</code> and <code>staging-ssh</code>.</td></tr><tr><td>GitHub deploy job is skipped</td><td>Wrong branch/tag event.</td><td>Push the <code>staging</code> branch or a <code>v*</code> tag; manual runs intentionally perform CI only.</td></tr><tr><td>Permission denied restarting service</td><td>Restricted sudo rule missing.</td><td>Add the single-service sudoers rule and verify the systemctl path.</td></tr><tr><td>Health check fails</td><td>Bad Mongo URI, service environment, port, or dependency.</td><td>Run <code>systemctl status</code> and <code>journalctl -u student-registration</code> on the VM.</td></tr><tr><td>Tests try to reach MongoDB</td><td>Old upstream tests are running.</td><td>Confirm the fork contains the injected <code>MONGO_TEST_CLIENT</code> test fixture.</td></tr></table>
+  </section>
+
+  <section>
+    <h2>7. Final Submission Checklist</h2>
+    <ol><li>Use GitHub's Fork action for the provided repository under <code>TabrezAjaz</code>.</li><li>Set the local <code>origin</code> to that fork and push <code>main</code>.</li><li>Create and push the <code>staging</code> branch.</li><li>Configure the Jenkins credentials, SMTP, pipeline, and webhook.</li><li>Create GitHub <code>staging</code> and <code>production</code> environments with secrets and variables.</li><li>Run Jenkins from a <code>main</code> push and save all Jenkins screenshots.</li><li>Push <code>staging</code>, then push a <code>v1.0.0</code> tag and save GitHub Actions screenshots.</li><li>Add screenshots under <code>docs/screenshots</code>, commit, and push.</li><li>Open this report and print to PDF if required by Vlearn.</li><li>Submit <code>GitHub Repository Link - CI CD Pipeline.txt</code>.</li></ol>
+    <div class="callout warning"><strong>Before submitting:</strong> remove the word “pending” from this report only after the corresponding real evidence exists. Never include private keys, tokens, passwords, or unmasked secret values in screenshots.</div>
+  </section>
+
+  <footer>DevOps CI/CD Pipeline Assignment &nbsp;|&nbsp; Flask &nbsp;|&nbsp; Jenkins &nbsp;|&nbsp; GitHub Actions &nbsp;|&nbsp; Tabrez Ajaz</footer>
+</main>
+</body>
+</html>

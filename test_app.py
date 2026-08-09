@@ -1,17 +1,17 @@
 import pytest
-from app import app, mongo
+import mongomock
+from app import app, student_collection
 from bson.objectid import ObjectId
 
 @pytest.fixture
 def client():
     app.config["TESTING"] = True
-    app.config["MONGO_URI"] = "mongodb://localhost:27017/test_student_db"  # test DB
+    app.config["MONGO_TEST_CLIENT"] = mongomock.MongoClient()
     client = app.test_client()
 
     # Setup: clear and create test data
     with app.app_context():
-        mongo.db.students.delete_many({})
-        mongo.db.students.insert_one({
+        student_collection().insert_one({
             "_id": ObjectId("66fddff25f4b5f6a0a123456"),
             "name": "Test Student",
             "email": "test@student.com",
@@ -19,9 +19,7 @@ def client():
         })
     yield client
 
-    # Teardown: drop DB after test
-    with app.app_context():
-        mongo.cx.drop_database("test_student_db")
+    app.config.pop("MONGO_TEST_CLIENT")
 
 
 def test_home_page(client):
@@ -29,6 +27,12 @@ def test_home_page(client):
     response = client.get('/')
     assert response.status_code == 200
     assert b"Test Student" in response.data
+
+
+def test_health_check(client):
+    response = client.get('/health')
+    assert response.status_code == 200
+    assert response.get_json()["status"] == "healthy"
 
 
 def test_add_student(client):
@@ -52,7 +56,7 @@ def test_delete_student(client):
     """Test deleting a student"""
     # Add a temporary student
     with app.app_context():
-        student_id = mongo.db.students.insert_one({
+        student_id = student_collection().insert_one({
             "name": "Temp User",
             "email": "temp@user.com",
             "course": "Temp Course"

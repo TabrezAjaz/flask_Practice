@@ -1,0 +1,7 @@
+DevOps CI/CD Pipeline Assignment
+Submitted by: Tabrez Ajaz
+
+Repository URL:
+https://github.com/TabrezAjaz/flask_Practice
+
+Note: Create the fork under the TabrezAjaz account and push this completed local repository before submission.
